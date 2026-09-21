@@ -22,7 +22,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Heavy / Kaggle-image-provided extras. Installed by the notebook only if missing.
+# Heavy / Kaggle-image-provided extras. The notebook checks for these and only
+# installs what is actually missing (scripts are import-guarded so a partial
+# environment degrades instead of dying).
 train = [
     "torch>=2.1",
     "torchvision>=0.16",
@@ -34,8 +36,17 @@ train = [
     "seaborn>=0.12",
     "tqdm>=4.64",
     "scikit-image>=0.22",
+    "packaging>=23.0",
 ]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "nbformat>=5.9"]
+
+[project.scripts]
+# Console entry points that dispatch into the repo's scripts/ directory, so
+# `pip install -e .` gives Kaggle users short commands as well as plain paths.
+histo-robust-train = "histo_robust.cli:train_main"
+histo-robust-evaluate = "histo_robust.cli:evaluate_main"
+histo-robust-splits = "histo_robust.cli:prepare_splits_main"
+histo-robust-smoke = "histo_robust.cli:smoke_main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

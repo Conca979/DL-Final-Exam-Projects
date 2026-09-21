@@ -430,6 +430,100 @@ def test_config_overrides() -> None:
     check("config: malformed override raises", _raises(lambda: apply_overrides(cfg, ["train.lr"])))
 
 
+def test_experiment_matrix() -> None:
+    """Every registry entry must resolve to a runnable, consistent config.
+
+    This is the check that catches the classic ablation defect: two cells that
+    were supposed to differ only in the axis under test but also differ in the
+    learning rate, batch size or epoch count, which would invalidate the
+    comparison.
+    """
+    print("\n== experiment matrix ==")
+    import json
+
+    from histo_robust.augmentation import AUGMENTATION_CHOICES
+    from histo_robust.models import BACKBONE_CHOICES
+    from histo_robust.normalization import NORMALIZATION_CHOICES
+    from histo_robust.utils.config import load_config
+
+    registry_path = REPO_ROOT / "configs" / "experiments_registry.json"
+    if not registry_path.exists():
+        check("registry exists", False, str(registry_path))
+        return
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))["experiments"]
+    check("registry lists all 13 cells of PLAN.md", len(registry) == 13, f"got {len(registry)}")
+    check("registry experiment ids are unique",
+          len({e["exp_id"] for e in registry}) == len(registry))
+
+    axes_ok = True
+    shared_ok = True
+    reference = None
+    for entry in registry:
+        config_path = REPO_ROOT / entry["config"]
+        if not config_path.exists():
+            check(f"{entry['exp_id']}: config file exists", False, str(config_path))
+            axes_ok = False
+            continue
+        cfg = load_config(config_path, repo_root=REPO_ROOT)
+        backbone = cfg["model"]["backbone"]
+        norm = cfg["normalization"]["name"]
+        policy = cfg["augmentation"]["policy"]
+        if backbone not in BACKBONE_CHOICES or norm not in NORMALIZATION_CHOICES or policy not in AUGMENTATION_CHOICES:
+            check(f"{entry['exp_id']}: axes are valid", False, f"{backbone}/{norm}/{policy}")
+            axes_ok = False
+        if backbone != entry["backbone"] or norm != entry["normalization"] or policy != entry["augmentation"]:
+            check(f"{entry['exp_id']}: config matches the registry row", False,
+                  f"config={backbone}/{norm}/{policy} registry={entry['backbone']}/{entry['normalization']}/{entry['augmentation']}")
+            axes_ok = False
+
+        # Controlled-comparison invariants.
+        signature = (
+            round(float(cfg["train"]["lr"]), 8),
+            int(cfg["train"]["epochs"]),
+            round(float(cfg["train"]["weight_decay"]), 8),
+            round(float(cfg["train"]["label_smoothing"]), 8),
+            int(cfg["data"]["image_size"]),
+            int(cfg["data"]["batch_size"]) * int(cfg["train"]["grad_accum_steps"]),
+            cfg["train"]["scheduler"],
+            int(cfg["checkpoints"]["save_every_steps"]),
+            int(cfg["checkpoints"]["keep_last"]),
+            round(float(cfg["train"]["max_train_minutes"]), 3),
+        )
+        if reference is None:
+            reference = signature
+        elif signature != reference:
+            shared_ok = False
+            print(f"    {entry['exp_id']} differs from EXP-01 in shared settings: {signature} vs {reference}")
+
+    check("all registry cells use a valid axis value and match their config", axes_ok)
+    check("all cells share lr / epochs / wd / smoothing / resolution / effective batch / schedule / checkpoint policy",
+          shared_ok)
+    check("Phikon cells use batch 32 x 2 accumulation (PLAN.md §5)",
+          all(
+              int(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["data"]["batch_size"]) == 32
+              and int(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["train"]["grad_accum_steps"]) == 2
+              for e in registry
+              if e["backbone"] == "phikon"
+          ))
+    check("the 630-minute short-session recipe is set in every cell",
+          all(
+              float(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["train"]["max_train_minutes"]) == 630.0
+              for e in registry
+          ))
+    check("checkpoint pruning is active in every cell (20 GB guard)",
+          all(
+              int(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["checkpoints"]["keep_last"]) >= 1
+              and float(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["checkpoints"]["run_quota_gb"]) > 0
+              for e in registry
+          ))
+    check("reference tile path is repo-relative and shared by every normalising cell",
+          all(
+              load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["normalization"]["reference_path"]
+              == "data/processed/templates/reference_stain.png"
+              for e in registry
+          ))
+
+
 # ---------------------------------------------------------------------------
 def _raises(fn) -> bool:
     try:
@@ -464,6 +558,7 @@ def main() -> int:
     print("histo_robust local self-test (NumPy-only components)")
     print("=" * 70)
     test_config_overrides()
+    test_experiment_matrix()
     test_metrics()
     test_time_budget()
     test_augmentation()

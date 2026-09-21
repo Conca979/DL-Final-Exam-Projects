@@ -589,6 +589,28 @@ class Trainer:
                 steps_per_epoch=steps_per_epoch,
             )
             self._train_history.append(epoch_metrics)
+            epoch_truncated = bool(epoch_metrics.get("truncated"))
+
+            if epoch_truncated:
+                # Partial epoch -> skip validation and the best-checkpoint update;
+                # the run is about to stop anyway and every remaining second of
+                # the session budget is better spent on the next cell.
+                logger.warning(
+                    "%s | epoch %d cut short by the time box after %d/%d batches; "
+                    "skipping validation and stopping cleanly.",
+                    self.exp_id,
+                    epoch,
+                    epoch_metrics.get("batches_done"),
+                    epoch_metrics.get("batches_total"),
+                )
+                self.manager.save(
+                    self._build_payload(epoch), self._global_step, kind="last", epoch=epoch
+                )
+                self.manager.enforce_quota()
+                self._epochs_seen = epoch + 1
+                stop_reason = self.time_budget.stop_reason
+                status = "interrupted"
+                break
 
             val_preds = run_inference(
                 self.model,
@@ -715,9 +737,17 @@ class Trainer:
             else steps_per_epoch
         )
         accum_counter = 0
+        truncated = False
+        last_step = -1
         for step_in_epoch, (images, labels) in enumerate(batches()):
             if self.time_budget.should_stop():
+                # Stop at a batch boundary; the caller skips validation when the
+                # epoch was cut short, because a partial epoch's weights are not
+                # worth the minutes a validation pass would cost out of the
+                # remaining session budget.
+                truncated = True
                 break
+            last_step = step_in_epoch
             with torch.cuda.amp.autocast(enabled=bool(self.amp)):
                 logits = self.model(images)
                 loss = criterion(logits, labels) / self.grad_accum_steps
@@ -746,6 +776,9 @@ class Trainer:
                         self._build_payload(epoch), self._global_step, kind="rolling", epoch=epoch
                     )
                     self.manager.enforce_quota()
+                    if self.time_budget.should_stop():
+                        truncated = True
+                        break
 
             batch_size = labels.shape[0]
             running_loss += float(loss.item()) * self.grad_accum_steps * batch_size
@@ -760,6 +793,9 @@ class Trainer:
             "global_step": int(self._global_step),
             "lr": self._current_lr(),
             "elapsed_min": round(self.time_budget.elapsed_minutes, 3),
+            "truncated": bool(truncated),
+            "batches_done": int(last_step + 1),
+            "batches_total": int(total_batches),
         }
         return metrics
 

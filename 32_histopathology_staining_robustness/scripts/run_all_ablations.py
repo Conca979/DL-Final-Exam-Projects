@@ -60,6 +60,7 @@ from histo_robust.utils.config import config_hash, load_config  # noqa: E402
 from histo_robust.utils.kaggle import configure_logging, log_environment  # noqa: E402
 from histo_robust.utils.seed import set_seed  # noqa: E402
 from histo_robust.utils.timebudget import (  # noqa: E402
+    STOP_EARLY_STOP,
     BudgetAllocator,
     SessionClock,
     TimeBudget,
@@ -154,14 +155,25 @@ class Manifest:
         return dict((self.data.get("experiments", {}) or {}).get(exp_id, {}))
 
     def is_complete(self, exp_id: str) -> Tuple[bool, str]:
+        """A cell counts as done only when it trained to its planned stopping point.
+
+        ``status`` alone is not enough: a cell that was time-boxed mid-training is
+        evaluated so its interim numbers are visible, but it must still be resumed
+        next session.
+        """
         entry = self.get(exp_id)
         if entry.get("status") != "completed":
             return False, f"status={entry.get('status', 'absent')}"
         best = entry.get("best_path")
         if best and not Path(best).exists():
             return False, "checkpoint is gone (not in this session's /kaggle/working)"
-        if not entry.get("evaluation", {}).get("test_id", {}).get("macro_f1"):
-            return False, "no in-domain evaluation recorded"
+        planned = entry.get("planned_epochs")
+        done = entry.get("epochs_completed")
+        early = entry.get("stop_reason") == STOP_EARLY_STOP
+        if not early and planned and done is not None and int(done) < int(planned):
+            return False, f"time-boxed at {done}/{planned} epochs"
+        if not entry.get("test_id_macro_f1"):
+            return False, "no in-domain (test_id) evaluation recorded"
         return True, "completed"
 
     def update(self, exp_id: str, **fields: Any) -> None:
@@ -315,12 +327,64 @@ def run_one_cell(
                         },
                     )
 
-            status = "completed" if evaluation and evaluation.get("test_id") else "interrupted"
+            # A cell only counts as COMPLETE when its training actually ran to the
+            # planned stopping point (all epochs, or early stopping). A time-boxed
+            # cell still gets evaluated -- the numbers are real, just interim --
+            # but it is recorded as "interrupted" so the next session resumes it
+            # instead of treating a partial curve as the final result.
+            planned_epochs = int((attempt_cfg.get("train", {}) or {}).get("epochs", 12))
+            finished = result.status == "completed" and result.epochs_completed >= planned_epochs
+            early_stopped = result.stop_reason == "early_stopping"
+            status = "completed" if (finished or early_stopped) else "interrupted"
+            if status == "interrupted":
+                logger.warning(
+                    "%s | time-boxed after %d/%d epochs (stop=%s); results are INTERIM "
+                    "and this cell will resume next session.",
+                    exp_id,
+                    result.epochs_completed,
+                    planned_epochs,
+                    result.stop_reason,
+                )
+
+            if result.status != "failed" and result.best_path:
+                splits = ["test_id", "test_ood"] if args.eval_test_ood else ["test_id"]
+                loaders = build_eval_loaders(
+                    attempt_cfg,
+                    splits=splits,
+                    reference=reference,
+                    repo_root=REPO_ROOT,
+                    post_training=True,
+                )
+                if not trainer.load_best_weights():
+                    logger.error("%s | checkpoint unusable; skipping evaluation", exp_id)
+                else:
+                    evaluation = evaluate_experiment(
+                        cfg=attempt_cfg,
+                        exp_id=exp_id,
+                        model=trainer.model,
+                        loaders=loaders,
+                        output_root=Path(args.results_dir) / "per_experiment",
+                        class_names=list(attempt_cfg.get("data", {}).get("class_names", [])),
+                        amp=bool((attempt_cfg.get("train", {}) or {}).get("amp", True)),
+                        extra_meta={
+                            "stage": entry.get("stage"),
+                            "backbone": entry.get("backbone"),
+                            "normalization": entry.get("normalization"),
+                            "augmentation": entry.get("augmentation"),
+                            "config_hash": config_hash(attempt_cfg),
+                            "attempt": attempt + 1,
+                            "run_status": status,
+                            "epochs_completed": result.epochs_completed,
+                            "planned_epochs": planned_epochs,
+                        },
+                    )
+
             manifest.update(
                 exp_id,
                 status=status,
                 stop_reason=result.stop_reason,
                 epochs_completed=result.epochs_completed,
+                planned_epochs=planned_epochs,
                 best_val_macro_f1=result.best_val_macro_f1,
                 best_epoch=result.best_epoch,
                 trained_seconds=result.trained_seconds,
@@ -330,7 +394,16 @@ def run_one_cell(
                 config=entry.get("config"),
                 config_hash=config_hash(attempt_cfg),
                 batch_size=(attempt_cfg.get("data", {}) or {}).get("batch_size"),
+                # Flat, greppable evaluation summary for the manifest and the
+                # session-level tables (the full tables live in the per-experiment
+                # JSON/CSV artefacts).
                 evaluation=(evaluation or {}).get("robustness", {}),
+                test_id_macro_f1=((evaluation or {}).get("test_id") or {}).get("macro_f1"),
+                test_id_accuracy=((evaluation or {}).get("test_id") or {}).get("accuracy"),
+                test_ood_macro_f1=((evaluation or {}).get("test_ood") or {}).get("macro_f1"),
+                test_ood_accuracy=((evaluation or {}).get("test_ood") or {}).get("accuracy"),
+                delta_f1=((evaluation or {}).get("robustness") or {}).get("delta_macro_f1"),
+                rr_f1=((evaluation or {}).get("robustness") or {}).get("rr_macro_f1"),
                 attempt=attempt + 1,
             )
 
