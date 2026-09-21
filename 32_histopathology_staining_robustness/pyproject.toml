@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "histo-robust"
+version = "0.1.0"
+description = "Robust histopathology image classification under staining variations (NCT-CRC-HE-100K-NONORM -> CRC-VAL-HE-7K)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+# NOTE (Kaggle): every entry below ships pre-installed in the Kaggle PyTorch/GPU
+# image, so `pip install -e .` resolves instantly and offline. Keeping the list
+# explicit lets us assert versions at runtime instead of installing on the fly.
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=1.5",
+    "scikit-learn>=1.2",
+    "PyYAML>=6.0",
+    "Pillow>=9.0",
+]
+
+[project.optional-dependencies]
+# Heavy / Kaggle-image-provided extras. Installed by the notebook only if missing.
+train = [
+    "torch>=2.1",
+    "torchvision>=0.16",
+    "timm>=0.9.16",
+    "transformers>=4.38",
+    "albumentations>=1.4",
+    "opencv-python-headless>=4.8",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+    "tqdm>=4.64",
+    "scikit-image>=0.22",
+]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+histo_robust = ["configs/*.yaml", "configs/experiments/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,149 @@
+{
+  "description": "Single source of truth for the 13-cell ablation matrix in PLAN.md section 3. scripts/run_all_ablations.py executes these in order; RUN_LOG.md and RESULTS.md mirror the same ordering.",
+  "class_names": ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"],
+  "experiments": [
+    {
+      "exp_id": "EXP-01",
+      "stage": "Stage 0",
+      "config": "configs/experiments/exp01_baseline_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "none",
+      "augmentation": "none",
+      "research_question": "Primary baseline: in-domain and OOD performance under raw staining.",
+      "comparator": "anchor"
+    },
+    {
+      "exp_id": "EXP-02",
+      "stage": "Stage 1",
+      "config": "configs/experiments/exp02_norm_reinhard_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "reinhard",
+      "augmentation": "none",
+      "research_question": "Does statistical Lab colour transfer improve out-of-domain generalisation?",
+      "comparator": "EXP-01"
+    },
+    {
+      "exp_id": "EXP-03",
+      "stage": "Stage 1",
+      "config": "configs/experiments/exp03_norm_macenko_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "macenko",
+      "augmentation": "none",
+      "research_question": "Does optical-density H&E deconvolution outperform statistical colour transfer?",
+      "comparator": "EXP-01, EXP-02"
+    },
+    {
+      "exp_id": "EXP-04",
+      "stage": "Stage 2",
+      "config": "configs/experiments/exp04_aug_geo_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "none",
+      "augmentation": "aug_geo",
+      "research_question": "What portion of robustness is attributable solely to spatial invariance?",
+      "comparator": "EXP-01"
+    },
+    {
+      "exp_id": "EXP-05",
+      "stage": "Stage 2",
+      "config": "configs/experiments/exp05_aug_stain_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "none",
+      "augmentation": "aug_stain",
+      "research_question": "Does synthetic HED stain jitter match or exceed explicit stain normalisation?",
+      "comparator": "EXP-01, EXP-03"
+    },
+    {
+      "exp_id": "EXP-06",
+      "stage": "Stage 2",
+      "config": "configs/experiments/exp06_aug_combined_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "none",
+      "augmentation": "aug_combined",
+      "research_question": "Are spatial and stain augmentations additive without normalisation?",
+      "comparator": "EXP-04, EXP-05"
+    },
+    {
+      "exp_id": "EXP-07",
+      "stage": "Stage 3",
+      "config": "configs/experiments/exp07_interaction_macenko_geo_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "macenko",
+      "augmentation": "aug_geo",
+      "research_question": "Does Macenko normalisation plus spatial augmentation yield gains?",
+      "comparator": "EXP-03, EXP-04"
+    },
+    {
+      "exp_id": "EXP-08",
+      "stage": "Stage 3",
+      "config": "configs/experiments/exp08_interaction_macenko_stain_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "macenko",
+      "augmentation": "aug_stain",
+      "research_question": "Does stain jitter add value to normalised tiles, or do they conflict?",
+      "comparator": "EXP-03, EXP-05"
+    },
+    {
+      "exp_id": "EXP-09",
+      "stage": "Stage 3",
+      "config": "configs/experiments/exp09_interaction_macenko_combined_resnet50.yaml",
+      "backbone": "resnet50",
+      "weights_source": "ImageNet-1k",
+      "normalization": "macenko",
+      "augmentation": "aug_combined",
+      "research_question": "Defended ResNet baseline: peak ResNet performance under full defence.",
+      "comparator": "EXP-01, EXP-06"
+    },
+    {
+      "exp_id": "EXP-10",
+      "stage": "Stage 4",
+      "config": "configs/experiments/exp10_backbone_convnext_raw.yaml",
+      "backbone": "convnext_tiny",
+      "weights_source": "ImageNet-1k",
+      "normalization": "none",
+      "augmentation": "none",
+      "research_question": "Is a modern ConvNet intrinsically more robust to stain shift than ResNet?",
+      "comparator": "EXP-01"
+    },
+    {
+      "exp_id": "EXP-11",
+      "stage": "Stage 4",
+      "config": "configs/experiments/exp11_backbone_convnext_best.yaml",
+      "backbone": "convnext_tiny",
+      "weights_source": "ImageNet-1k",
+      "normalization": "macenko",
+      "augmentation": "aug_combined",
+      "research_question": "Does ConvNeXt-Tiny benefit from the combined normalisation/augmentation policy?",
+      "comparator": "EXP-09, EXP-10"
+    },
+    {
+      "exp_id": "EXP-12",
+      "stage": "Stage 4",
+      "config": "configs/experiments/exp12_backbone_phikon_raw.yaml",
+      "backbone": "phikon",
+      "weights_source": "Histopathology (TCGA iBOT)",
+      "normalization": "none",
+      "augmentation": "none",
+      "research_question": "Does large-scale histology SSL pretraining give intrinsic stain invariance without defences?",
+      "comparator": "EXP-01, EXP-10"
+    },
+    {
+      "exp_id": "EXP-13",
+      "stage": "Stage 4",
+      "config": "configs/experiments/exp13_backbone_phikon_best.yaml",
+      "backbone": "phikon",
+      "weights_source": "Histopathology (TCGA iBOT)",
+      "normalization": "macenko",
+      "augmentation": "aug_combined",
+      "research_question": "Can foundation-model representations be boosted further by normalisation and augmentation?",
+      "comparator": "EXP-09, EXP-11, EXP-12"
+    }
+  ]
+}

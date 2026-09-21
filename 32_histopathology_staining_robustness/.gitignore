@@ -1,0 +1,12 @@
+# workflow.md
+workflow.md
+
+# dataset
+data/
+zipped_dataset/
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
