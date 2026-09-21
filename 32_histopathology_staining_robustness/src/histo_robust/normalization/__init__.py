@@ -1,7 +1,12 @@
 """Stain / colour normalisation (Axis B)."""
 
 from .base import BaseNormalizer, NormalizerStats
-from .macenko import MacenkoNormalizer, estimate_stain_matrix
+from .macenko import (
+    MacenkoNormalizer,
+    canonical_he_stain_matrix,
+    estimate_stain_matrix,
+    stain_matrix_separation_deg,
+)
 from .normalizer_factory import (
     NORMALIZATION_CHOICES,
     build_normalizer,
@@ -17,6 +22,8 @@ __all__ = [
     "ReinhardNormalizer",
     "MacenkoNormalizer",
     "estimate_stain_matrix",
+    "canonical_he_stain_matrix",
+    "stain_matrix_separation_deg",
     "build_normalizer",
     "resolve_reference_image",
     "load_image_rgb",

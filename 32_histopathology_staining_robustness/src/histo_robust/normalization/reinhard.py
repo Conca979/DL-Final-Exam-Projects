@@ -20,6 +20,63 @@ from .base import BaseNormalizer, _as_uint8_rgb
 
 __all__ = ["ReinhardNormalizer"]
 
+#: D65 white point used by the skimage-free CIELAB fallback.
+_D65 = np.array([0.95047, 1.00000, 1.08883], dtype=np.float64)
+_EPS = 216.0 / 24389.0
+_KAPPA = 24389.0 / 27.0
+
+
+def _srgb_to_linear(c: np.ndarray) -> np.ndarray:
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def _linear_to_srgb(c: np.ndarray) -> np.ndarray:
+    return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(np.clip(c, 0, None), 1 / 2.4) - 0.055)
+
+
+def _f_forward(t: np.ndarray) -> np.ndarray:
+    return np.where(t > _EPS, np.cbrt(t), (_KAPPA * t + 16.0) / 116.0)
+
+
+def _f_inverse(t: np.ndarray) -> np.ndarray:
+    t3 = t**3
+    return np.where(t3 > _EPS, t3, (116.0 * t - 16.0) / _KAPPA)
+
+
+def _srgb_to_lab(rgb01: np.ndarray) -> np.ndarray:
+    """sRGB in [0, 1] -> CIELAB, matching ``skimage.color.rgb2lab`` numerically."""
+    linear = _srgb_to_linear(np.clip(rgb01, 0.0, 1.0))
+    xyz = linear @ np.array(
+        [
+            [0.4124564, 0.2126729, 0.0193339],
+            [0.3575761, 0.7151522, 0.1191920],
+            [0.1804375, 0.0721750, 0.9503041],
+        ]
+    ).T
+    xyz = xyz / _D65
+    f = _f_forward(xyz)
+    lab = np.empty_like(f)
+    lab[..., 0] = 116.0 * f[..., 1] - 16.0
+    lab[..., 1] = 500.0 * (f[..., 0] - f[..., 1])
+    lab[..., 2] = 200.0 * (f[..., 1] - f[..., 2])
+    return lab
+
+
+def _lab_to_srgb(lab: np.ndarray) -> np.ndarray:
+    fy = (lab[..., 0] + 16.0) / 116.0
+    fx = fy + lab[..., 1] / 500.0
+    fz = fy - lab[..., 2] / 200.0
+    f = np.stack([fx, fy, fz], axis=-1)
+    xyz = _f_inverse(f) * _D65
+    linear = xyz @ np.array(
+        [
+            [3.2404542, -0.9692660, 0.0556434],
+            [-1.5371385, 1.8760108, -0.2040259],
+            [-0.4985314, 0.0415560, 1.0572252],
+        ]
+    ).T
+    return np.clip(_linear_to_srgb(linear), 0.0, 1.0)
+
 
 class ReinhardNormalizer(BaseNormalizer):
     """Standard Lab-space Reinhard normalisation."""
@@ -42,15 +99,22 @@ class ReinhardNormalizer(BaseNormalizer):
     # ------------------------------------------------------------------
     @staticmethod
     def _rgb2lab(rgb: np.ndarray) -> np.ndarray:
-        from skimage.color import rgb2lab
+        """sRGB -> CIELAB (D65).  sklearn-free fallback if skimage is missing."""
+        try:
+            from skimage.color import rgb2lab
 
-        return rgb2lab(rgb.astype(np.float64) / 255.0)
+            return rgb2lab(rgb.astype(np.float64) / 255.0)
+        except ImportError:
+            return _srgb_to_lab(rgb.astype(np.float64) / 255.0)
 
     @staticmethod
     def _lab2rgb(lab: np.ndarray) -> np.ndarray:
-        from skimage.color import lab2rgb
+        try:
+            from skimage.color import lab2rgb
 
-        out = lab2rgb(lab) * 255.0
+            out = lab2rgb(lab) * 255.0
+        except ImportError:
+            out = _lab_to_srgb(lab) * 255.0
         return np.clip(out, 0, 255).astype(np.uint8)
 
     def _tissue_mask(self, lab: np.ndarray) -> np.ndarray:

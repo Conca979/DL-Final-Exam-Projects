@@ -99,7 +99,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if candidate.exists():
             cfg.setdefault("normalization", {})["reference_path"] = str(candidate)
 
-    prefer_cached_splits(cfg)
+    if prefer_cached_splits(cfg):
+        logger.warning(
+            "%s | evaluating from the pre-normalised cache. The checkpoint must have "
+            "been trained with the same cache (or the online equivalent); verify "
+            "config_hash in the checkpoint against this run's config hash.",
+            exp_id,
+        )
 
     set_seed(int(cfg.get("runtime", {}).get("seed", 42)))
     log_environment(logger)

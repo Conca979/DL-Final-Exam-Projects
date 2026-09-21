@@ -245,6 +245,7 @@ def run_one_cell(
     session_clock: SessionClock,
     minutes: float,
     manifest: Manifest,
+    session_deadline_epoch: Optional[float] = None,
 ) -> Dict[str, Any]:
     """Train + evaluate a single ablation cell, with an OOM retry ladder."""
     exp_id = entry["exp_id"]
@@ -266,11 +267,7 @@ def run_one_cell(
             budget = TimeBudget(
                 max_minutes=minutes,
                 reserve_minutes=args.reserve_minutes,
-                session_deadline_epoch=(
-                    _session_start_epoch(args.session_start) + args.session_minutes * 60.0
-                    if (args.session_start or _session_start_epoch(None))
-                    else None
-                ),
+                session_deadline_epoch=session_deadline_epoch,
                 label=exp_id,
                 consumed_before=session_clock.consumed_seconds(exp_id),
             )
@@ -504,6 +501,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             session_clock=session_clock,
             minutes=minutes,
             manifest=manifest,
+            session_deadline_epoch=deadline,
         )
         outcomes.append(outcome)
 
