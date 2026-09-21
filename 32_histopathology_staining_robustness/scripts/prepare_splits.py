@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Build the train / val_id / test_id / test_ood split CSVs.
 
-Implements ``dataset_card.md`` section 4 exactly:
+Implements ``docs/dataset_card.md`` section 4 exactly:
 
 * source domain ``NCT-CRC-HE-100K-NONORM`` -> stratified 70 / 15 / 15 split with
   ``seed=42`` (train / val_id / test_id);

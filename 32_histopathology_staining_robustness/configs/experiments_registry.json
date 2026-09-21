@@ -1,5 +1,5 @@
 {
-  "description": "Single source of truth for the 13-cell ablation matrix in PLAN.md section 3. scripts/run_all_ablations.py executes these in order; RUN_LOG.md and RESULTS.md mirror the same ordering.",
+  "description": "Single source of truth for the 13-cell ablation matrix in docs/PLAN.md section 3. scripts/run_all_ablations.py executes these in order; docs/RUN_LOG.md and docs/RESULTS.md mirror the same ordering.",
   "class_names": ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"],
   "experiments": [
     {

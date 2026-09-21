@@ -18,7 +18,7 @@
 project: histo-robust
 dataset_source: NCT-CRC-HE-100K-NONORM
 dataset_target: CRC-VAL-HE-7K
-seed_note: PLAN.md fixes the split seed at 42; runtime.seed mirrors it.
+seed_note: docs/PLAN.md fixes the split seed at 42; runtime.seed mirrors it.
 runtime:
   seed: 42
   deterministic: true

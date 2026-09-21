@@ -295,7 +295,7 @@ class BudgetAllocator:
     * never spend more than ``per_exp_minutes`` on one cell (protects the matrix
       from one slow backbone eating the whole night).
 
-    Experiments are executed in ``PLAN.md`` order, so the baseline cells that
+    Experiments are executed in ``docs/PLAN.md`` order, so the baseline cells that
     every other comparison depends on are produced first even if the session ends
     early.
     """

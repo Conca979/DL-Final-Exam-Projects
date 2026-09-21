@@ -72,7 +72,7 @@ CELL_00_MD = """
 # Robust Histopathology Classification under Staining Variations
 ### `NCT-CRC-HE-100K-NONORM` (in-domain) -> `CRC-VAL-HE-7K` (out-of-domain)
 
-This notebook runs the full 13-cell ablation matrix from `PLAN.md` under Kaggle's
+This notebook runs the full 13-cell ablation matrix from `docs/PLAN.md` under Kaggle's
 hard limits:
 
 | Kaggle limit | How this notebook handles it |
@@ -83,7 +83,10 @@ hard limits:
 | No disk between sessions | Resume is automatic: the newest `last.pt` in the mounted checkpoint dataset is copied back and training continues from the stored epoch/step. |
 
 **Before running:** attach the datasets and pick the accelerator.
-See `kaggle_guide.md` for the exact click-by-click procedure.
+See `docs/kaggle_guide.md` for the exact click-by-click procedure, and start at
+`docs/README.md` for the rest of the documentation (`docs/PLAN.md` design,
+`docs/RUN_LOG.md` register, `docs/RESULTS.md` tables, `docs/APPENDICES.md`
+artifact/config/CLI reference).
 
 * Accelerator: **GPU P100** or **GPU T4 x2**
 * Internet: **ON** for the first run (downloads pretrained weights). OFF is fine
@@ -170,7 +173,7 @@ else:
     if code_zip is None:
         raise SystemExit(
             "FATAL: could not find the codebase zip under /kaggle/input.\\n"
-            "Attach the 'histo-robust-code' dataset (see kaggle_guide.md), then re-run."
+            "Attach the 'histo-robust-code' dataset (see docs/kaggle_guide.md), then re-run."
         )
     print(f"[1a] extracting {code_zip} -> {REPO}")
     safe_extract(code_zip, REPO)
@@ -332,7 +335,7 @@ if TARGET_ROOT is None and archives["target"] is not None:
 if SOURCE_ROOT is None or TARGET_ROOT is None:
     raise SystemExit(
         "FATAL: could not locate the datasets. Attach 'nct-crc-he-100k-nonorm' and "
-        "'crc-val-he-7k' as Kaggle datasets (see kaggle_guide.md). Found dirs under "
+        "'crc-val-he-7k' as Kaggle datasets (see docs/kaggle_guide.md). Found dirs under "
         f"/kaggle/input: {[str(p) for p in sorted(INPUT.glob('*'))]}"
     )
 
@@ -691,7 +694,7 @@ Optional companion notebook. Point `RESULTS_DIR` at the downloaded `results/`
 folder (or attach it as a Kaggle dataset) and this cell produces:
 
 * `summary_results.csv` re-ordered by stage, with the ablation matrix columns,
-* `RESULTS_TABLE.md` -- a Markdown table ready to paste into `RESULTS.md`,
+* `RESULTS_TABLE.md` -- a Markdown table ready to paste into `docs/RESULTS.md`,
 * a check that every one of the 13 cells has both an in-domain and an
   out-of-domain number (i.e. no half-measured cells).
 

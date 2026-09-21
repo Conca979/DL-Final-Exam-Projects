@@ -1,17 +1,16 @@
-# workflow.md
-workflow.md
-
-# dataset
+# dataset (raw + zipped archives stay out of git)
 data/
 zipped_dataset/
+
 # python
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 
-
 # build artifacts
 dist/
 .scratch_*
 
+# NOTE: docs/workflow.md (the original three-agent brief) is intentionally
+# tracked -- it is kept under docs/ for provenance only.

@@ -1,5 +1,9 @@
 # RESULTS — Ablation Matrix
 
+> `docs/` index: [`README.md`](README.md) · plan: [`PLAN.md`](PLAN.md) · procedure:
+> [`kaggle_guide.md`](kaggle_guide.md) · run register: [`RUN_LOG.md`](RUN_LOG.md) ·
+> reference: [`APPENDICES.md`](APPENDICES.md)
+
 Every cell below is **pending**. Nothing in this file may be filled in until the
 corresponding run has actually happened; all numbers come from
 `results/metrics/summary_results.csv`, which is written automatically by
@@ -23,7 +27,7 @@ Sources, per cell:
 renders the main table straight from the CSV, so prefer pasting that over typing
 numbers by hand.
 
-### Metric definitions (`PLAN.md` §4)
+### Metric definitions (`docs/PLAN.md` §4)
 
 * **Macro-F1** — primary metric. Harmonic mean of precision and recall per class,
   then averaged over the nine classes. Immune to the class imbalance in
@@ -48,7 +52,7 @@ asserts disjoint paths and that `train`/`val_id` contain the source domain only.
 
 ---
 
-## Table 1 — Main Ablation Matrix (`PLAN.md` §3)
+## Table 1 — Main Ablation Matrix (`docs/PLAN.md` §3)
 
 | Exp ID | Stage | Backbone | Weights | Normalization | Augmentation | Status | Epochs (completed/planned) | Val Macro-F1 | Test-ID Macro-F1 | Test-OOD Macro-F1 | **ΔF1 (ID−OOD)** | **RR-F1 (%)** |
 | :---: | :---: | :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -128,7 +132,7 @@ the time box rather than by the method.
 
 ## Table 4 — Per-Class OOD Performance
 
-Schema and class order match `dataset_card.md` §2. One block per cell, filled
+Schema and class order match `docs/dataset_card.md` §2. One block per cell, filled
 from `metrics_test_ood.json` → `per_class`. `AUROC` is one-vs-rest for that class
 and is `n/a` if a class is absent from the evaluated subset.
 
@@ -150,7 +154,7 @@ and is `n/a` if a class is absent from the evaluated subset.
 ### EXP-02 … EXP-13 — pending
 
 Add one block per cell using the same schema once the run exists. The per-class
-breakdown exists specifically to test `PLAN.md` §2's hypothesis that colour
+breakdown exists specifically to test `docs/PLAN.md` §2's hypothesis that colour
 normalisation can degrade difficult morphological boundaries — in particular
 `STR` vs `MUS` and normal vs malignant epithelium (`NORM` vs `TUM`).
 
@@ -208,7 +212,7 @@ place to look if a result is surprising.
 Interpretation notes for later:
 
 * `background skips` counts tiles above the 85 %-glass threshold that bypassed
-  SVD deconvolution (`PLAN.md` Risk 1). A large count is expected for the `BACK`
+  SVD deconvolution (`docs/PLAN.md` Risk 1). A large count is expected for the `BACK`
   class and is not an error.
 * `fallbacks to raw` counts tiles where normalisation raised and a raw copy was
   substituted. A non-zero value must be explained before the cell's result is

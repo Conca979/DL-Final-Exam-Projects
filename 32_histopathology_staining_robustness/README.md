@@ -11,13 +11,13 @@ problem.
   RWTH Aachen patients. Never used for training, scheduling, or checkpoint
   selection.
 
-Planning documents: [`PLAN.md`](PLAN.md) (experiment design, evaluation protocol,
-tech stack) and [`dataset_card.md`](dataset_card.md) (dataset, splits, folder
+Planning documents: [`docs/PLAN.md`](docs/PLAN.md) (experiment design, evaluation protocol,
+tech stack) and [`docs/dataset_card.md`](docs/dataset_card.md) (dataset, splits, folder
 layout).
 
 ## Quick start on Kaggle
 
-Full procedure: [`kaggle_guide.md`](kaggle_guide.md).
+Full procedure: [`docs/kaggle_guide.md`](docs/kaggle_guide.md).
 
 ```powershell
 # 1. Build the three upload artifacts (forward-slash-safe zips; never use the
@@ -66,7 +66,7 @@ python tests/local_selftest.py     # ~30 s, dependency-light sanity checks
 | E — backbone | EXP-10, EXP-11, EXP-12, EXP-13 | ConvNeXt-Tiny and Phikon (histology SSL) under raw and defended settings |
 
 `configs/experiments_registry.json` is the single source of truth for the matrix;
-`scripts/run_all_ablations.py`, `RUN_LOG.md` and `RESULTS.md` all follow its order.
+`scripts/run_all_ablations.py`, `docs/RUN_LOG.md` and `docs/RESULTS.md` all follow its order.
 
 ## Evaluation
 
@@ -80,18 +80,29 @@ Robustness is quantified as `ΔF1 = F1_ID − F1_OOD` (lower is better) and
 ## Repository layout
 
 ```text
-├── PLAN.md / dataset_card.md      # planning documents (read first)
-├── kaggle_guide.md                # click-by-click Kaggle procedure
-├── RUN_LOG.md / RESULTS.md        # run register and results tables (to be filled)
-├── configs/                       # base_config.yaml + experiments_registry.json
-│   └── experiments/               # 13 generated per-cell YAMLs
-├── src/histo_robust/              # library: normalization, augmentation, data,
-│                                  # models, engine, utils
-├── scripts/                       # prepare_splits, preprocess_normalize, smoke_test,
-│                                  # train, evaluate, run_all_ablations, make_zips
-├── kaggle/                        # notebooks + notebook_helpers
-└── tests/local_selftest.py        # dependency-light self-test suite
+README.md                  # entry point (this file)
+docs/                      # all project documentation — start at docs/README.md
+configs/                   # base_config.yaml + experiments_registry.json
+configs/experiments/       # 13 generated per-cell YAMLs
+src/histo_robust/          # library: normalization, augmentation, data, models, engine, utils
+scripts/                   # prepare_splits, preprocess_normalize, smoke_test,
+                           # train, evaluate, run_all_ablations, make_zips
+kaggle/                    # notebooks + notebook_helpers
+tests/local_selftest.py    # dependency-light self-test suite
 ```
+
+## Documentation
+
+Start at [`docs/README.md`](docs/README.md) for the full index. The short version:
+
+| Document | Read it to… |
+| :--- | :--- |
+| [`docs/PLAN.md`](docs/PLAN.md) | understand what is tested and why (§3 holds the 13-cell matrix) |
+| [`docs/dataset_card.md`](docs/dataset_card.md) | know the exact data, class order and split rules |
+| [`docs/kaggle_guide.md`](docs/kaggle_guide.md) | run it on Kaggle, including the between-session checkpoint workflow |
+| [`docs/RUN_LOG.md`](docs/RUN_LOG.md) | record what each session did |
+| [`docs/RESULTS.md`](docs/RESULTS.md) | report the metrics in the agreed table shape |
+| [`docs/APPENDICES.md`](docs/APPENDICES.md) | look up an output file, config key or CLI flag |
 
 ## Kaggle survival features
 

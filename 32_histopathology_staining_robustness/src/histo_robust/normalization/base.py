@@ -1,4 +1,4 @@
-"""Stain / colour normalisation algorithms (Axis B of ``PLAN.md``).
+"""Stain / colour normalisation algorithms (Axis B of ``docs/PLAN.md``).
 
 Two deterministic, reference-based methods are implemented:
 
@@ -12,7 +12,7 @@ Both share the same contract:
 * return **uint8 RGB** of identical shape and dtype,
 * are *stateless after fit* and therefore safe to call inside DataLoader workers,
 * never raise on pathological tiles: the tissue-mask guard and a ``try/except``
-  fallback (Risk 1 in ``PLAN.md``) demote failures to a pass-through copy while
+  fallback (Risk 1 in ``docs/PLAN.md``) demote failures to a pass-through copy while
   incrementing a counter that the trainer logs at the end of the run.
 """
 

@@ -295,7 +295,7 @@ def test_metrics() -> None:
     # One misclassification must cost exactly 1/9 of macro-F1 for one class:
     # the collapsed class contributes F1=0 and the absorbing class F1=2/3,
     # so macro-F1 = (7 + 2/3) / 9 = 0.851852 while accuracy is 8/9 = 0.888889.
-    # The gap between the two is precisely why PLAN.md makes Macro-F1 primary.
+    # The gap between the two is precisely why docs/PLAN.md makes Macro-F1 primary.
     y_true = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8])
     y_pred = y_true.copy()
     y_pred[2] = 5
@@ -346,7 +346,7 @@ def test_time_budget() -> None:
     check("budget: stops when the run budget is exhausted", exhausted.should_stop())
     check("budget: reason is run_time_budget", exhausted.stop_reason == STOP_RUN_BUDGET)
 
-    # The 630-minute default from PLAN.md.
+    # The 630-minute default from docs/PLAN.md.
     default_budget = TimeBudget.from_config({}, label="EXP-01")
     check("budget: default is the 630-minute short-session recipe",
           default_budget.max_minutes == 630.0, f"got {default_budget.max_minutes}")
@@ -451,7 +451,7 @@ def test_experiment_matrix() -> None:
         check("registry exists", False, str(registry_path))
         return
     registry = json.loads(registry_path.read_text(encoding="utf-8"))["experiments"]
-    check("registry lists all 13 cells of PLAN.md", len(registry) == 13, f"got {len(registry)}")
+    check("registry lists all 13 cells of docs/PLAN.md", len(registry) == 13, f"got {len(registry)}")
     check("registry experiment ids are unique",
           len({e["exp_id"] for e in registry}) == len(registry))
 
@@ -498,7 +498,7 @@ def test_experiment_matrix() -> None:
     check("all registry cells use a valid axis value and match their config", axes_ok)
     check("all cells share lr / epochs / wd / smoothing / resolution / effective batch / schedule / checkpoint policy",
           shared_ok)
-    check("Phikon cells use batch 32 x 2 accumulation (PLAN.md §5)",
+    check("Phikon cells use batch 32 x 2 accumulation (docs/PLAN.md §5)",
           all(
               int(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["data"]["batch_size"]) == 32
               and int(load_config(REPO_ROOT / e["config"], repo_root=REPO_ROOT)["train"]["grad_accum_steps"]) == 2

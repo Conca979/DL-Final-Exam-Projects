@@ -13,7 +13,7 @@ Resolution order used by :func:`resolve_reference_image`:
    which needs no file at all and keeps Kaggle runs reproducible.
 
 The reference is selected from the **source training cohort only** -- never from
-``CRC-VAL-HE-7K`` (see the firewall in ``PLAN.md`` section 4.1).
+``CRC-VAL-HE-7K`` (see the firewall in ``docs/PLAN.md`` section 4.1).
 """
 
 from __future__ import annotations

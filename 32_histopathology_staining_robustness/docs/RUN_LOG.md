@@ -1,6 +1,10 @@
 # RUN_LOG — Ablation Run Register
 
-One section per cell of the ablation matrix (`PLAN.md` §3). Fill in one **attempt
+> `docs/` index: [`README.md`](README.md) · plan: [`PLAN.md`](PLAN.md) · procedure:
+> [`kaggle_guide.md`](kaggle_guide.md) · results: [`RESULTS.md`](RESULTS.md) ·
+> reference: [`APPENDICES.md`](APPENDICES.md)
+
+One section per cell of the ablation matrix (`docs/PLAN.md` §3). Fill in one **attempt
 block per Kaggle session** used on that cell — a cell that spans two sessions has
 two blocks, which is the normal case given the 10.5 h time box.
 

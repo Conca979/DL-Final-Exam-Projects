@@ -12,11 +12,11 @@ for this project:
 * If Internet is ON, weights download on first use and are cached in
   ``~/.cache`` for the rest of the session.
 * If Internet is OFF (or the download is flaky) the loader looks for a locally
-  mounted copy first.  ``PLAN.md`` requires an offline path for the foundation
+  mounted copy first.  ``docs/PLAN.md`` requires an offline path for the foundation
   model, so the search covers the standard Kaggle "model dataset" layouts:
   ``<dataset>/phikon/``, ``<dataset>/models--owkin--phikon/`` and a plain
   ``pytorch_model.bin``/``model.safetensors`` next to a ``config.json``.
-  ``kaggle_guide.md`` explains how to build that dataset in five minutes.
+  ``docs/kaggle_guide.md`` explains how to build that dataset in five minutes.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ __all__ = [
     "estimate_backbone_vram_note",
 ]
 
-#: Registry mirroring the "Backbone" column of the ablation matrix in PLAN.md.
+#: Registry mirroring the "Backbone" column of the ablation matrix in docs/PLAN.md.
 BACKBONE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "resnet50": {
         "family": "timm",
@@ -198,7 +198,7 @@ def load_hf_backbone(
             f"Failed to load Hugging Face backbone '{model_name}'. Phikon is "
             f"ungated, so a network failure is the usual cause. Enable Kaggle "
             f"Internet, or mount the model as a dataset and point "
-            f"paths.weights_dir at it (see kaggle_guide.md, section 'Offline "
+            f"paths.weights_dir at it (see docs/kaggle_guide.md, section 'Offline "
             f"model weights'). Original error: {type(exc).__name__}: {exc}"
         ) from exc
 

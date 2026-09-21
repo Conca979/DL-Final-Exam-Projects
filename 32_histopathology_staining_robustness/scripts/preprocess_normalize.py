@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Offline stain-normalisation cache (``PLAN.md`` risk 2 mitigation).
+"""Offline stain-normalisation cache (``docs/PLAN.md`` risk 2 mitigation).
 
 Macenko's SVD deconvolution costs ~15-40 ms per 224x224 tile on CPU.  Doing that
 inside a DataLoader worker seven times per epoch starves the GPU and turns a

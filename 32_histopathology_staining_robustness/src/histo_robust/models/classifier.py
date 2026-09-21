@@ -1,12 +1,12 @@
 """Task head on top of a frozen or fine-tuned backbone (Axis E).
 
 The classifier is intentionally thin -- ``Dropout -> Linear`` on the pooled
-feature -- because every experiment in ``PLAN.md`` reuses exactly the same head.
+feature -- because every experiment in ``docs/PLAN.md`` reuses exactly the same head.
 That way a difference in OOD robustness can only come from the representation
 (Axis E) or from what the representation was trained to ignore (Axes B/C/D),
 never from an architectural confound in the head.
 
-``freeze_backbone=True`` enables the linear-probe fallback required by ``PLAN.md``
+``freeze_backbone=True`` enables the linear-probe fallback required by ``docs/PLAN.md``
 risk 5 (Phikon on a 16 GB T4/P100).  In that mode ``scripts/train.py`` switches to
 a two-phase recipe: cache the backbone features once, then fit the head on the
 cached tensors, which removes the 86M-parameter backward pass entirely.

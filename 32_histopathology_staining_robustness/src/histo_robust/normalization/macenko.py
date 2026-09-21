@@ -17,7 +17,7 @@ Implementation notes / deviations from torchstain:
 * The 99th-percentile is recomputed **per tile** over its own tissue pixels
   (torchstain's ``stain_matrix_target`` path uses a fixed scalar for the whole
   dataset, which does not transfer across scanners).
-* ``Risk 1`` guard from ``PLAN.md``: tiles that are >85% slide glass bypass the
+* ``Risk 1`` guard from ``docs/PLAN.md``: tiles that are >85% slide glass bypass the
   SVD entirely; any residual numerical failure is caught by
   :meth:`BaseNormalizer.normalize` and demoted to a raw copy.
 """

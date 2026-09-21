@@ -185,8 +185,8 @@ Robustness to staining variations is explicitly quantified via two primary mathe
 ```text
 32_histopathology_staining_robustness/
 ├── README.md
-├── PLAN.md
-├── dataset_card.md
+├── docs/PLAN.md
+├── docs/dataset_card.md
 ├── requirements.txt
 ├── configs/
 │   ├── base_config.yaml
@@ -299,7 +299,41 @@ Robustness to staining variations is explicitly quantified via two primary mathe
 
 ---
 
-## 8. Open Questions for the Human
+## 8. Documentation Map
+
+The planning decisions above are frozen; the execution documents that follow
+from them live alongside this file in `docs/`:
+
+| Document | Contents | Use it when |
+| :--- | :--- | :--- |
+| [`README.md`](README.md) | index, reading order, document status | first contact with the project |
+| [`PLAN.md`](PLAN.md) | this file — experiment design, evaluation protocol, tech stack | you need the *why* behind a design choice |
+| [`dataset_card.md`](dataset_card.md) | dataset, class definitions, split strategy, folder layout | you need to know exactly what data is used and how it is partitioned |
+| [`kaggle_guide.md`](kaggle_guide.md) | the operational procedure for the 12-hour GPU environment | you are about to run something |
+| [`RUN_LOG.md`](RUN_LOG.md) | run register — one attempt block per cell per session | before and after every session |
+| [`RESULTS.md`](RESULTS.md) | results tables matching §3's matrix, metric columns defined | a run has produced numbers to report |
+| [`APPENDICES.md`](APPENDICES.md) | artifact schemas, config-key and CLI reference, glossary | you need to look up a file, key or flag |
+| [`workflow.md`](workflow.md) | the original three-agent brief | provenance only (superseded by this plan) |
+
+Mapping from this document's design to the implementation:
+
+| `PLAN.md` section | Implemented by |
+| :--- | :--- |
+| §3 Axis A (anchor) | `configs/experiments/exp01_baseline_resnet50.yaml` |
+| §3 Axis B (normalisation) | `src/histo_robust/normalization/` (`reinhard.py`, `macenko.py`) |
+| §3 Axis C (augmentation) | `src/histo_robust/augmentation/` (`geometric.py`, `stain_jitter.py`) |
+| §3 Axis D (interaction) | the Stage 3 configs (EXP-07 … EXP-09) |
+| §3 Axis E (backbones) | `src/histo_robust/models/backbones.py` |
+| §4.1 split strategy | `scripts/prepare_splits.py` |
+| §4.2 metrics | `src/histo_robust/utils/metrics.py` |
+| §4.3 robustness maths | `evaluate_experiment()` in `src/histo_robust/engine/evaluator.py` |
+| §5 tech stack | `pyproject.toml` + `kaggle/notebook_helpers.py` |
+| §6 repository structure | the tree in §6 above, plus `docs/` and `kaggle/` |
+| §7 risks 1–5 | guards documented in [`APPENDICES.md`](APPENDICES.md) §D |
+
+---
+
+## 9. Open Questions for the Human
 
 All technical, algorithmic, and architectural decisions have been made according to computational pathology best practices. There is only one operational parameter for the user to confirm:
 
@@ -307,4 +341,7 @@ All technical, algorithmic, and architectural decisions have been made according
   - The plan specifies a standardized **25,000 patch stratified subset** of `NCT-CRC-HE-100K-NONORM` (17,500 train / 3,750 val / 3,750 test) as the default training pool, enabling all 13 ablation runs to finish in ~6-8 hours on a single GPU.
   - If the researcher has an enterprise GPU (A100/H100) or extra time and wishes to train on the **full 100,000 patches**, the data pipeline already supports the `--full` flag without any code modifications.
 
--> propose step by step setup for training in kaggle
+**Resolved.** The step-by-step Kaggle setup this section originally asked for is
+now written up in [`kaggle_guide.md`](kaggle_guide.md), and the 25,000-patch
+subset remains the default (`scripts/prepare_splits.py --subset 25000`, or
+`FULL = True` in notebook cell 3 for the full 100,000).

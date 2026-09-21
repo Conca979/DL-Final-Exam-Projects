@@ -10,7 +10,7 @@
 project: histo-robust
 dataset_source: NCT-CRC-HE-100K-NONORM
 dataset_target: CRC-VAL-HE-7K
-seed_note: "PLAN.md fixes the split seed at 42; runtime.seed mirrors it."
+seed_note: "docs/PLAN.md fixes the split seed at 42; runtime.seed mirrors it."
 
 # --- Reproducibility ---------------------------------------------------------
 runtime:
@@ -34,12 +34,12 @@ paths:
 
 # --- Data --------------------------------------------------------------------
 data:
-  # Canonical class order from dataset_card.md section 2.  Do not reorder: the
+  # Canonical class order from docs/dataset_card.md section 2.  Do not reorder: the
   # label_idx column in the split CSVs is positional.
   class_names: [ADI, BACK, DEB, LYM, MUC, MUS, NORM, STR, TUM]
   num_classes: 9
   image_size: 224            # native patch resolution; no upsampling
-  batch_size: 64             # ResNet-50 / ConvNeXt-Tiny (PLAN.md section 5)
+  batch_size: 64             # ResNet-50 / ConvNeXt-Tiny (docs/PLAN.md section 5)
   num_workers: 4             # Kaggle gives 4 vCPU; raise only if the loader starves the GPU
   pin_memory: true
   persistent_workers: true
@@ -61,7 +61,7 @@ normalization:
     angular_percentile: 99.0
     concentration_percentile: 99.0
     alpha: 1.0
-    background_fraction_limit: 0.85   # PLAN.md Risk 1: skip SVD above 85% glass
+    background_fraction_limit: 0.85   # docs/PLAN.md Risk 1: skip SVD above 85% glass
 
 # --- Axis C: augmentation policy --------------------------------------------
 # none | aug_geo | aug_stain | aug_combined

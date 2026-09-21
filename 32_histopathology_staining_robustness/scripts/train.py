@@ -307,7 +307,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.eval_test_ood:
             logger.warning(
                 "%s | OOD audit requested from train.py. Running it strictly AFTER "
-                "training has finished and checkpoints are frozen (PLAN.md risk 3).",
+                "training has finished and checkpoints are frozen (docs/PLAN.md risk 3).",
                 exp_id,
             )
         trainer.setup_model()

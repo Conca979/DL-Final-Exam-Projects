@@ -1,6 +1,6 @@
 """histo_robust -- Robust histopathology classification under staining variations.
 
-Implements the experiment matrix defined in ``PLAN.md``:
+Implements the experiment matrix defined in ``docs/PLAN.md``:
 
 * Axis A -- anchor baseline (ResNet-50, raw RGB, no augmentation)
 * Axis B -- colour normalisation (None / Reinhard / Macenko)

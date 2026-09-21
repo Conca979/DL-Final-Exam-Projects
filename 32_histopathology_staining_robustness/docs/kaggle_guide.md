@@ -1,7 +1,11 @@
 # Kaggle Setup Guide — Robust Histopathology Classification under Staining Variations
 
+> `docs/` index: [`README.md`](README.md) · plan: [`PLAN.md`](PLAN.md) · dataset:
+> [`dataset_card.md`](dataset_card.md) · run register: [`RUN_LOG.md`](RUN_LOG.md) ·
+> results: [`RESULTS.md`](RESULTS.md) · reference: [`APPENDICES.md`](APPENDICES.md)
+
 This is the exact, click-by-click procedure for running the 13-cell ablation matrix
-(`PLAN.md` §3) on Kaggle's free GPU tier.
+(`docs/PLAN.md` §3) on Kaggle's free GPU tier.
 
 Read the four rules first — they are the ones that actually cost people runs:
 
@@ -26,7 +30,7 @@ mechanical — use the provided script.
 * This repository on disk.
 
 No approval walls, no credentials, no registration — both files are direct HTTP
-downloads under CC-BY 4.0 (`dataset_card.md` §3).
+downloads under CC-BY 4.0 (`docs/dataset_card.md` §3).
 
 ---
 
@@ -87,9 +91,9 @@ If you would rather do it by hand, use `zip` and never a GUI tool:
 ```bash
 cd /path/to/32_histopathology_staining_robustness
 zip -r dist/histo-robust-code.zip \
-    src scripts configs kaggle tests \
-    pyproject.toml README.md PLAN.md dataset_card.md \
-    -x '*/__pycache__/*' '*.pyc' 'data/*' 'checkpoints/*' 'results/*'
+    src scripts configs kaggle tests docs \
+    pyproject.toml README.md \
+    -x '*/__pycache__/*' '*.pyc' 'data/*' 'checkpoints/*' 'results/*' 'dist/*'
 ```
 
 Verify before uploading:

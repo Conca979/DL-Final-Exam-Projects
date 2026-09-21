@@ -4,7 +4,7 @@
 without forcing the user to remember relative script paths.  The heavy lifting
 stays in ``scripts/`` so the files remain directly runnable --
 ``python scripts/train.py`` is still the primary interface, exactly as
-``kaggle_guide.md`` documents.
+``docs/kaggle_guide.md`` documents.
 
 Implementation note: the scripts are loaded by file path with ``importlib``
 rather than imported as a package, because ``scripts/`` is deliberately not a

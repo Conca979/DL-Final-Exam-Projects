@@ -1,6 +1,6 @@
 """Evaluation metrics for the 9-class colorectal tissue task.
 
-Primary metric (per ``PLAN.md`` section 4.2):
+Primary metric (per ``docs/PLAN.md`` section 4.2):
 
 * ``macro_f1``        -- primary, class-balanced
 * ``balanced_acc``    -- macro-averaged recall
@@ -8,7 +8,7 @@ Primary metric (per ``PLAN.md`` section 4.2):
 * ``macro_auroc``     -- macro one-vs-rest AUROC on softmax probabilities
 * ``ece``             -- expected calibration error (15 equal-mass-free bins)
 
-Robustness quantification (``PLAN.md`` section 4.3)::
+Robustness quantification (``docs/PLAN.md`` section 4.3)::
 
     delta_f1 = f1_id  - f1_ood      # lower is better
     rr_f1    = f1_ood / f1_id * 100 # higher is better
@@ -33,7 +33,7 @@ __all__ = [
     "CLASS_NAMES",
 ]
 
-#: Canonical class order (must match ``dataset_card.md`` section 2).
+#: Canonical class order (must match ``docs/dataset_card.md`` section 2).
 CLASS_NAMES: Tuple[str, ...] = (
     "ADI",
     "BACK",
@@ -71,7 +71,7 @@ def _sklearn_metrics():
 # ---------------------------------------------------------------------------
 # NumPy fallbacks
 #
-# Kaggle ships scikit-learn, and ``PLAN.md`` selects it as the reference
+# Kaggle ships scikit-learn, and ``docs/PLAN.md`` selects it as the reference
 # implementation, so the sklearn path is always preferred.  These fallbacks exist
 # so that (a) a partially provisioned environment can still produce the numbers
 # instead of failing at the very end of a 10-hour run, and (b) the verifier can

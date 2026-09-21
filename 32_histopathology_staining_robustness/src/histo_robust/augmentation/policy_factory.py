@@ -1,6 +1,6 @@
 """Augmentation policy factory (Axis C).
 
-Four policies, matching the ablation matrix in ``PLAN.md`` section 3:
+Four policies, matching the ablation matrix in ``docs/PLAN.md`` section 3:
 
 ===============  ==========================================================
 policy key       content

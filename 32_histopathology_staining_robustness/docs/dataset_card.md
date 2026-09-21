@@ -1,5 +1,9 @@
 # Dataset Card: Colorectal Cancer Tissue Classification (NCT-CRC-HE-100K-NONORM & CRC-VAL-HE-7K)
 
+> `docs/` index: [`README.md`](README.md) · plan: [`PLAN.md`](PLAN.md) · procedure:
+> [`kaggle_guide.md`](kaggle_guide.md) · run register: [`RUN_LOG.md`](RUN_LOG.md) ·
+> results: [`RESULTS.md`](RESULTS.md) · reference: [`APPENDICES.md`](APPENDICES.md)
+
 ## 1. Dataset Overview
 
 This project investigates model robustness to histopathological staining variations using two paired, publicly available benchmark datasets of Hematoxylin and Eosin (H&E) stained colorectal tissue patches:

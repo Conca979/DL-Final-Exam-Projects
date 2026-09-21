@@ -48,7 +48,7 @@ CELL_OVERRIDES: Dict[str, Dict[str, Any]] = {
     "EXP-10": {"stage": "Stage 4", "model": {"backbone": "convnext_tiny"}, "normalization": {"name": "none"}, "augmentation": {"policy": "none"}},
     "EXP-11": {"stage": "Stage 4", "model": {"backbone": "convnext_tiny"}, "normalization": {"name": "macenko"}, "augmentation": {"policy": "aug_combined"}},
     # Phikon is a ViT-B/16: batch 32 with 2 accumulation steps == the ResNet
-    # effective batch of 64 (PLAN.md section 5, "Batch Size & Gradient Accumulation").
+    # effective batch of 64 (docs/PLAN.md section 5, "Batch Size & Gradient Accumulation").
     "EXP-12": {
         "stage": "Stage 4",
         "model": {"backbone": "phikon", "freeze_backbone": True, "dropout": 0.0},

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build the three zip files the Kaggle workflow needs -- with '/' separators.
+"""Build the zip files the Kaggle workflow needs -- with '/' separators.
 
 **Why this script exists.**  Windows' built-in "Send to > Compressed (zipped)
 folder" stores entry names with backslashes (``data\\raw\\ADI\\a.png``).  Those
@@ -8,16 +8,22 @@ Linux, so Kaggle's dataset shows one unusable blob instead of a directory tree.
 Python's ``zipfile`` always writes forward slashes and is therefore the safe way
 to package anything for Kaggle.
 
-Three archives are produced (or verified) in ``--out-dir``:
+Archives produced (or verified) in ``--out-dir``:
 
 1. ``histo-robust-code.zip``       -- the codebase (``src/``, ``scripts/``,
-   ``configs/``, ``pyproject.toml``, ...).  Small; upload as dataset #1.
+   ``configs/``, ``kaggle/``, ``docs/``, ``pyproject.toml``, ...).  Small; upload
+   as dataset #1, and refresh it with a new dataset version whenever the code or
+   docs change.
 2. ``NCT-CRC-HE-100K-NONORM.zip``  -- source domain.  Copied from
    ``--data-dir`` when you already have Zenodo's archive (its entry names are
    already correct); only re-packaged if you ask with ``--repack-data``.
 3. ``CRC-VAL-HE-7K.zip``           -- target domain, same treatment.
 4. ``histo-robust-checkpoints.zip`` -- optional; bundles a previous session's
-   ``checkpoints/`` for re-upload as dataset #3.
+   ``checkpoints/`` for re-upload as the checkpoint dataset (use the dataset's
+   **New Version** button next time, never a new dataset).
+
+Every produced archive is re-opened and checked for backslash, absolute or
+drive-letter entries; the script exits non-zero if any is found.
 
 Usage::
 
@@ -196,7 +202,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         else:
             print(
                 f"  MISSING {source}. Download it from Zenodo record 1214456 "
-                f"(see dataset_card.md section 3) or pass --data-dir/--repack-data."
+                f"(see docs/dataset_card.md section 3) or pass --data-dir/--repack-data."
             )
 
     print("\n[3/3] checkpoints")
@@ -233,7 +239,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print("  3. Upload CRC-VAL-HE-7K.zip as 'crc-val-he-7k'.")
     print("  4. After the first 10.5 h session, download the checkpoints output and")
     print("     upload it as 'histo-robust-checkpoints' -- then use 'New Version'")
-    print("     on that dataset for every later session (see kaggle_guide.md).")
+    print("     on that dataset for every later session (see docs/kaggle_guide.md).")
     print("=" * 74)
     return exit_code
 

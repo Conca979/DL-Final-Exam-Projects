@@ -12,7 +12,7 @@ frozen on ``val_id``, and it produces, per experiment:
 * ``confusion_test_{id,ood}.csv`` + ``.png`` -- row-normalised 9x9 matrices;
 * ``robustness.json`` -- ``delta_f1 = F1_ID - F1_OOD`` and
   ``rr_f1 = F1_OOD / F1_ID * 100`` (plus the same pair for accuracy and
-  balanced accuracy, per ``PLAN.md`` section 4.3);
+  balanced accuracy, per ``docs/PLAN.md`` section 4.3);
 * sample tile sheets (raw vs normalised) for eyeballing the pipeline.
 """
 
